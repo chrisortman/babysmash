@@ -82,11 +82,15 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Words\DictionaryTests.cs" />
-    <Compile Include="Words\LetterNode.cs" />
-    <Compile Include="Words\WordDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Babysmash\BabySmash.csproj">
+      <Project>{fb378e07-fde4-4fc7-9210-68f80b561164}</Project>
+      <Name>BabySmash</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

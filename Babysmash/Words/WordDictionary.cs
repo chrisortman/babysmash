@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 
-namespace Babysmash.Tests.Words {
+namespace BabySmash.Words {
     public class WordDictionary {
         private Subject<string> _wordEntered;
         private LetterNode _currentSearchScope;
@@ -62,6 +62,10 @@ namespace Babysmash.Tests.Words {
                 _buffer = new StringBuilder();
                 _currentSearchScope = null;
             }
+        }
+
+        public void SendKey(string key) {
+            SendKey(key[0]);
         }
     }
 }

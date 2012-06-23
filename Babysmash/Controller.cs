@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using BabySmash.Properties;
+using BabySmash.Words;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using WinForms = System.Windows.Forms;
@@ -38,6 +39,7 @@ namespace BabySmash
       private Queue<Shape> ellipsesQueue = new Queue<Shape>();
       private Dictionary<string,Queue<UserControl>> ellipsesUserControlQueue = new Dictionary<string,Queue<UserControl>>();
       private ApplicationDeployment deployment = null;
+       private WordDictionary _dictionary = new WordDictionary();
 
       void deployment_CheckForUpdateCompleted(object sender, CheckForUpdateCompletedEventArgs e)
       {
@@ -154,6 +156,12 @@ namespace BabySmash
 #if !false
          timer.Start();
 #endif
+          _dictionary.AddWord("dog");
+          _dictionary.AddWord("cat");
+
+          _dictionary.WordEntered.Subscribe(word => {
+              this.SpeakString(word);
+          });
       }
 
       void timer_Tick(object sender, EventArgs e)
@@ -192,6 +200,7 @@ namespace BabySmash
          string s = e.Key.ToString();
          if (s.Length == 2 && s[0] == 'D') s = s[1].ToString(); //HACK: WTF? Numbers start with a "D?" as in D1?
          AddFigure(uie, s);
+        _dictionary.SendKey(e.Key.ToString());
       }
 
       private void AddFigure(FrameworkElement uie, string s)

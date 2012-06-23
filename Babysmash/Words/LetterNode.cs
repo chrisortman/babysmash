@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Babysmash.Tests.Words {
+namespace BabySmash.Words {
     public class LetterNode {
         private Char _myLetter;
         private Dictionary<Char, LetterNode> _nextLetters = new Dictionary<char, LetterNode>();

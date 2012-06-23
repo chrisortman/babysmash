@@ -1,4 +1,5 @@
 ﻿using System;
+using BabySmash.Words;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
 
