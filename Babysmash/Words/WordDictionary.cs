@@ -43,9 +43,11 @@ namespace BabySmash.Words {
                     _buffer.Append(key);
                 } else {
                     _buffer.Clear();
-                    _currentSearchScope = _topLevelLetters[key];
-                    if(_currentSearchScope != null) {
-                        _buffer.Append(key);
+                    if (_topLevelLetters.ContainsKey(key)) {
+                        _currentSearchScope = _topLevelLetters[key];
+                        if (_currentSearchScope != null) {
+                            _buffer.Append(key);
+                        }
                     }
                 }
             } else {
@@ -66,6 +68,12 @@ namespace BabySmash.Words {
 
         public void SendKey(string key) {
             SendKey(key[0]);
+        }
+
+        public void AddWords(params string[] words) {
+            foreach(var word in words) {
+                AddWord(word);
+            }
         }
     }
 }

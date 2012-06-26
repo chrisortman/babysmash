@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reactive.Linq;
 using System.Speech.Synthesis;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -40,8 +42,9 @@ namespace BabySmash
       private Dictionary<string,Queue<UserControl>> ellipsesUserControlQueue = new Dictionary<string,Queue<UserControl>>();
       private ApplicationDeployment deployment = null;
        private WordDictionary _dictionary = new WordDictionary();
+       private Task<Prompt> _currentlySpeaking;
 
-      void deployment_CheckForUpdateCompleted(object sender, CheckForUpdateCompletedEventArgs e)
+       void deployment_CheckForUpdateCompleted(object sender, CheckForUpdateCompletedEventArgs e)
       {
          if (e.Error == null && e.UpdateAvailable)
          {
@@ -118,14 +121,14 @@ namespace BabySmash
  				};
 
 
-
+            
             ellipsesUserControlQueue[m.Name] = new Queue<UserControl>();
 
             m.Show();
             m.MouseLeftButtonDown += HandleMouseLeftButtonDown;
             m.MouseWheel += HandleMouseWheel;
 
-#if false
+#if true
             m.Width = 700;
             m.Height = 600;
             m.Left = 900;
@@ -134,6 +137,14 @@ namespace BabySmash
             m.WindowState = WindowState.Maximized;
 #endif
             windows.Add(m);
+
+             //var keyPresses =
+             //    Observable.FromEventPattern<KeyEventArgs>(m, "KeyUp").Throttle(TimeSpan.FromMilliseconds(300)).Select(kp => kp.EventArgs.Key.ToString());
+
+             //keyPresses.Subscribe(kp => {
+             //   _dictionary.SendKey(kp);
+             //});
+
          }
 
 	    //Only show the info label on the FIRST monitor.
@@ -158,9 +169,17 @@ namespace BabySmash
 #endif
           _dictionary.AddWord("dog");
           _dictionary.AddWord("cat");
+          _dictionary.AddWords("lincoln","preston","damon","mason","clara","mom","dad","cow","ball","car","tractor");
 
           _dictionary.WordEntered.Subscribe(word => {
-              this.SpeakString(word);
+              if (_currentlySpeaking != null)
+              {
+                  Thread.Sleep(300);
+                  _currentlySpeaking.ContinueWith(t => SpeakString(word));
+              }
+              else {
+                  this.SpeakString(word);
+              }
           });
       }
 
@@ -303,13 +322,14 @@ namespace BabySmash
          {
             if (template.Letter != null && template.Letter.Length == 1 && Char.IsLetterOrDigit(template.Letter[0]))
             {
-               SpeakString(template.Letter);
+                _currentlySpeaking = SpeakString(template.Letter);
             }
             else
             {
-               SpeakString(Utils.ColorToString(template.Color) + " " + template.Name);
+               _currentlySpeaking = SpeakString(Utils.ColorToString(template.Color) + " " + template.Name);
             }
          }
+
       }
 
       private void PlayLaughter()
@@ -317,38 +337,25 @@ namespace BabySmash
          audio.PlayWavResource(Utils.GetRandomSoundFile());
       }
 
-      private void SpeakString(string s)
+      private Task<Prompt> SpeakString(string s)
       {
-         ThreadedSpeak ts = new ThreadedSpeak(s);
-         ts.Speak();
+         var ts = new ThreadedSpeak(s);
+         return ts.Speak();
       }
 
       private class ThreadedSpeak
       {
-         string Word = null;
-         SpeechSynthesizer SpeechSynth = new SpeechSynthesizer();
-         public ThreadedSpeak(string Word)
+          readonly string _word = null;
+          readonly SpeechSynthesizer _speechSynth = new SpeechSynthesizer();
+         public ThreadedSpeak(string word)
          {
-            this.Word = Word;
-            SpeechSynth.Rate = -1;
-            SpeechSynth.Volume = 100;
+            this._word = word;
+            _speechSynth.Rate = -1;
+            _speechSynth.Volume = 100;
          }
-         public void Speak()
+         public async Task<Prompt> Speak()
          {
-            System.Threading.Thread oThread = new System.Threading.Thread(new System.Threading.ThreadStart(this.Start));
-            oThread.Start();
-         }
-         private void Start()
-         {
-            try
-            {
-               SpeechSynth.Speak(Word);
-            }
-            catch (Exception e)
-            {
-               System.Diagnostics.Trace.WriteLine(e.ToString());
-            }
-
+             return _speechSynth.SpeakAsync(_word);
          }
       }
 

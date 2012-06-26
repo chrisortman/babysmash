@@ -65,5 +65,24 @@ namespace Babysmash.Tests.Words {
 
             enteredWord.ShouldBe("dog");
         }
+
+        [TestMethod]
+        public void It_makes_me_sad_if_you_cant_say_dad() {
+            var dict = new WordDictionary();
+            dict.AddWord("Cat");
+            dict.AddWord("dog");
+            dict.AddWords("lincoln","preston","damon","mason","clara","mom","dad","cow","ball","car","tractor");
+
+            string enteredWord = "";
+            dict.WordEntered.Subscribe(word => {
+                enteredWord = word;
+            });
+
+            dict.SendKey('d');
+            dict.SendKey('a');
+            dict.SendKey('d');
+
+            enteredWord.ShouldBe("dad");
+        }
     }
 }

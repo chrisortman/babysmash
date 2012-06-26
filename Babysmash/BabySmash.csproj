@@ -70,6 +70,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ManagedAudioService.cs" />
     <Compile Include="Words\LetterNode.cs" />
     <Compile Include="Words\WordDictionary.cs" />
     <Reference Include="Microsoft.Reactive.Testing">

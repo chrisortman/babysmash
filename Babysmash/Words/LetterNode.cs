@@ -11,9 +11,13 @@ namespace BabySmash.Words {
         }
 
         public LetterNode AddChild(Char letter) {
-            var n = new LetterNode(letter);
-            _nextLetters.Add(letter, n);
-            return n;
+            if (_nextLetters.ContainsKey(letter)) {
+                return _nextLetters[letter];
+            } else {
+                var n = new LetterNode(letter);
+                _nextLetters.Add(letter, n);
+                return n;
+            }
         }
 
         public bool IsWordEnd() {
